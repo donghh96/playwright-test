@@ -7,6 +7,7 @@ export class TodoPage {
   readonly todoItems: Locator;
   readonly clearCompletedButton: Locator;
   readonly todoCount: Locator;
+  readonly toggleAllButton: Locator;
 
   //constructor
   constructor(page:Page) {
@@ -14,8 +15,15 @@ export class TodoPage {
     this.input = page.getByPlaceholder('What needs to be done?');
     this.todoItems = page.getByTestId('todo-item');
     //this.todoItems = page.locator('.todo-list li');
+    // this.toggleAllButton = page.getByText('Mark all as complete');
+    // this.toggleAllButton = page.getByLabel('Mark all as complete');
+    this.toggleAllButton = page.locator('input.toggle-all');
     this.clearCompletedButton = page.getByRole("button", {name: 'Clear Completed'});
     this.todoCount = page.getByTestId('todo-count');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/#/');
   }
 
   //add an todo item
@@ -27,7 +35,11 @@ export class TodoPage {
   //toggle an todo item
   async toggleTodo(text: string) {
     const row = this.todoItems.filter({hasText: text});
-    await row.getByRole('checkbox').click();
+    await row.getByRole('checkbox').click({force:true});
+  }
+
+  async toggleAll() {
+    await this.toggleAllButton.click();
   }
 
   //remove an todo item
@@ -37,7 +49,17 @@ export class TodoPage {
     await row.locator('button.destroy').click();
   }
 
-  async exepectDeleteNotExists(text: string) {
+  //edit an todo item
+  async editTodo(oldText: string, newText: string, pressKey: 'Enter' | 'Escape' = 'Enter') {
+    const todoItem = this.todoItems.filter({hasText: oldText});
+    await todoItem.dblclick();
+    const editInput = todoItem.locator('input.edit');
+
+    await editInput.fill(newText);
+    await editInput.press(pressKey);
+  }
+
+  async expectDeleteNotExists(text: string) {
     await expect(this.todoItems.filter({hasText: text})).not.toBeVisible();
   }
 
