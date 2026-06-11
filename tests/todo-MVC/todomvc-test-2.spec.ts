@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import {TodoPage} from '../../pages/TodoPage';
+import {TodoPage} from '../../pages/todo-MVC/TodoPage';
 
 test.describe('todoMVC basic tests', () => {
   let todoPage: TodoPage;
