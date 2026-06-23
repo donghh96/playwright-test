@@ -1,20 +1,22 @@
 import {test, expect} from '@playwright/test';
+import { createBookingData } from '../fixtures/restful-booker/BookingDataFactory';  
+
 test.describe('restful-booker API tests', () => {
   let token: string;
   const BASEURL = 'https://restful-booker.herokuapp.com';
   const createdId: number[] = [];
-  
-  const bookingData = {
-      "firstname": "Kitty",
-      "lastname": "Cat",
-      "totalprice": 100,
-      "depositpaid": true,
-      "bookingdates": {
-        "checkin": "2026-10-01",
-        "checkout": "2026-10-05"
-      },
-      "additionalneeds": "Breakfast"
-  };
+  const bookingData = createBookingData();
+  // const bookingData = {
+  //     "firstname": "Kitty",
+  //     "lastname": "Cat",
+  //     "totalprice": 100,
+  //     "depositpaid": true,
+  //     "bookingdates": {
+  //       "checkin": "2026-10-01",
+  //       "checkout": "2026-10-05"
+  //     },
+  //     "additionalneeds": "Breakfast"
+  // };
 
   test.beforeAll(async ({request}) => {
     //create a token
@@ -66,7 +68,7 @@ test.describe('restful-booker API tests', () => {
   test('post create booking', async ({request}) => {
     
     const response = await request.post(`${BASEURL}/booking`, {
-      data: bookingData
+      data: bookingData,
     });
     expect(response.status()).toBe(200);
     const body = await response.json();

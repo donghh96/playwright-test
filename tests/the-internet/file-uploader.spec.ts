@@ -5,7 +5,7 @@ test.beforeEach(async ({page}) => {
 });
 
 test('upload file by button', async({page}) => {
-  await page.locator('#file-upload').setInputFiles('tests/fixtures/abc.txt')
+  await page.locator('#file-upload').setInputFiles('tests/fixtures/the-internet/abc.txt')
   await page.getByRole('button', { name: 'Upload' }).click();
   await expect(page.getByText('File Uploaded!')).toBeVisible();
   await expect(page.getByText('abc.txt')).toBeVisible();
