@@ -23,7 +23,7 @@ test.describe('restful-booker basic tests', () => {
     await homePage.selectDate(30,1);
     await homePage.clickSearch();
     await homePage.bookButtons.nth(0).click();
-    await bookingPage.clickReserve()
+    await bookingPage.clickReserve();
     await bookingPage.fillBookingForm('Rabbit', 'White', 'rabbit.white@example.com', '12345678900');
     await bookingPage.clickReserve();
     //verify booking confirmation

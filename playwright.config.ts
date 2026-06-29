@@ -49,6 +49,20 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
 
+    {
+      name: 'setup',
+      testMatch: 'tests/restful-booker/auth.setup.ts',
+      // testMatch: /.*\.setup\.ts/,
+    },
+    {
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'],
+        storageState: '.auth/admin.json',
+       },
+       dependencies: ['setup'],
+       testMatch: 'tests/restful-booker/admin-dashboard.spec.ts',
+    },
+
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
