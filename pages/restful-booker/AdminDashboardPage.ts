@@ -1,12 +1,19 @@
 import {Locator, Page} from '@playwright/test';
 
-interface RoomOptions {
-  wifi ?: boolean;
-  tv?: boolean;
-  radio?: boolean;
-  refreshments?: boolean;
-  safe?: boolean;
-  views?: boolean;
+interface RoomData {
+  name : string;
+  type : 'Single' | 'Twin' | 'Double ' | 'Family' | 'Suite' ;
+  accessible : 'false' | 'true';
+  price : string;
+  roomDetails :
+  {
+    wifi ?: boolean;
+    tv?: boolean;
+    radio?: boolean;
+    refreshments?: boolean;
+    safe?: boolean;
+    views?: boolean;
+  }
 }
 export class AdminDashboardPage {
   constructor (private page: Page) {};
@@ -18,10 +25,6 @@ export class AdminDashboardPage {
   get rooms() : Locator { return this.page.getByTestId('roomlisting');}
   get createRoomFailedMessage() : Locator { return this.page.getByText('Failed to create room');}
   get createRoomPriceWrongMessage() : Locator {return this.page.getByText('must be greater than or equal to 1')}
-
-  // get roomName() : Locator { return this.page.getByTestId('roomName')};
-  // get roomType() : Locator { return this.page.locator('#type')};
-  // get roomAccessible() : Locator { return this.page.locator('#accessible')};
   
   async clickHomeLink() {
     await this.homeLink.click();
@@ -35,19 +38,26 @@ export class AdminDashboardPage {
   async clickMessagesLink() {
     await this.messagesLink.click();
   }
-  async createRoom(name: string, type: string, accessbile: string, price: string, options : RoomOptions = {})
+  async createRoom(roomdata : RoomData)
   {
-    const { wifi = false, tv = false, radio = false, refreshments = false, safe = false, views = false } = options;
-    await this.page.getByTestId('roomName').fill(name);
-    await this.page.locator('#type').selectOption(type);
-    await this.page.locator('#accessible').selectOption('true');
-    await this.page.locator('#roomPrice').fill(price);
-    await this.page.getByRole('checkbox', { name: 'WiFi'}).setChecked(wifi);
-    await this.page.getByRole('checkbox', { name: 'Refreshments' }).setChecked(refreshments);
-    await this.page.getByRole('checkbox', { name: 'TV' }).setChecked(tv);
-    await this.page.getByRole('checkbox', { name: 'Safe' }).setChecked(safe);
-    await this.page.getByRole('checkbox', { name: 'Radio' }).setChecked(radio);
-    await this.page.getByRole('checkbox', { name: 'Views' }).setChecked(views);
+    await this.page.getByTestId('roomName').fill(roomdata.name);
+    await this.page.locator('#type').selectOption(roomdata.type);
+    await this.page.locator('#accessible').selectOption(roomdata.accessible);
+    await this.page.locator('#roomPrice').fill(roomdata.price);
+    await this.page.getByRole('checkbox', { name: 'WiFi'}).setChecked(roomdata.roomDetails.wifi??false);
+    await this.page.getByRole('checkbox', { name: 'Refreshments' }).setChecked(roomdata.roomDetails.refreshments??false);
+    await this.page.getByRole('checkbox', { name: 'TV' }).setChecked(roomdata.roomDetails.tv??false);
+    await this.page.getByRole('checkbox', { name: 'Safe' }).setChecked(roomdata.roomDetails.safe??false);
+    await this.page.getByRole('checkbox', { name: 'Radio' }).setChecked(roomdata.roomDetails.radio??false);
+    await this.page.getByRole('checkbox', { name: 'Views' }).setChecked(roomdata.roomDetails.views??false);
     await this.page.getByRole('button', {name: 'Create'}).click();
+  }
+  getRoomByName(roomName : string)
+  {
+    return this.rooms.filter({hasText: roomName});
+  }
+  async deleteRoom(roomName : string)
+  {
+    await (await this.getRoomByName(roomName)).locator('.roomDelete').click();
   }
 }
