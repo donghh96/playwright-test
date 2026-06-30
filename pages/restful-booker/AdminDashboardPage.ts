@@ -21,10 +21,16 @@ export class AdminDashboardPage {
   get homeLink() : Locator { return this.page.getByRole('link', { name: 'Restful Booker Platform Demo' }); }
   get roomsLink() : Locator { return this.page.getByRole('link', { name: 'Rooms' }); }
   get reportLink() : Locator { return this.page.getByRole('link', { name: 'Report'});}
+  get brandingLink() : Locator { return this.page.getByRole('link', {name: 'branding'});}
   get messagesLink() : Locator { return this.page.getByRole('link', { name: 'Messages'});}
   get rooms() : Locator { return this.page.getByTestId('roomlisting');}
   get createRoomFailedMessage() : Locator { return this.page.getByText('Failed to create room');}
   get createRoomPriceWrongMessage() : Locator {return this.page.getByText('must be greater than or equal to 1')}
+  get reportTabCalender() : Locator {return this.page.getByRole('table', {name: 'Month View'})};
+  get brandingTabHeadingBB() : Locator { return this.page.getByRole('heading', {name: 'B&B details'});}
+  get brandingTabHeadingMap() : Locator { return this.page.getByRole('heading', {name: 'Map details'});}
+  get brandingTabHeadingContact() : Locator { return this.page.getByRole('heading', {name: 'Contact details'});}
+  get brandingTabHeadingAdderess() : Locator { return this.page.getByRole('heading', {name: 'Address details'});}
   
   async clickHomeLink() {
     await this.homeLink.click();
@@ -34,6 +40,9 @@ export class AdminDashboardPage {
   }
   async clickReportLink() {
     await this.reportLink.click();
+  }
+  async clickBrandingLink() {
+    await this.brandingLink.click();
   }
   async clickMessagesLink() {
     await this.messagesLink.click();

@@ -40,7 +40,7 @@ test.describe('admin dashboard tests', () => {
     await expect(adminDashboardPage.createRoomPriceWrongMessage).toBeVisible();
   });
 
-  test('should delete a room successfully', async({page}) => {
+  test('should delete a room successfully', async({}) => {
     const roomName = `Room-${Date.now()}`;
     await adminDashboardPage.createRoom({name:roomName, type:'Single', accessible:'true', price:'220', roomDetails:{tv:true, wifi:true}});
     // verify room created
@@ -48,5 +48,20 @@ test.describe('admin dashboard tests', () => {
     await expect(newroom).toBeVisible();
     await adminDashboardPage.deleteRoom(roomName);
     await expect(newroom).toHaveCount(0);
+  });
+
+  test('should navigate to report page sucessfully', async({page}) => {
+    await adminDashboardPage.clickReportLink();
+    await expect(page).toHaveURL(/report/);
+    await expect(adminDashboardPage.reportTabCalender).toBeVisible();
+  });
+
+  test('should navigate to branding page sucessfully', async({page}) => {
+    await adminDashboardPage.clickBrandingLink();
+    await expect(page).toHaveURL(/branding/);
+    await expect(adminDashboardPage.brandingTabHeadingBB).toBeVisible();
+    await expect(adminDashboardPage.brandingTabHeadingMap).toBeVisible();
+    await expect(adminDashboardPage.brandingTabHeadingContact).toBeVisible();
+    await expect(adminDashboardPage.brandingTabHeadingAdderess).toBeVisible();
   });
 });
