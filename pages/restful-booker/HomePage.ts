@@ -15,7 +15,9 @@ export class HomePage {
   get bookButtons(): Locator {
     return this.page.locator('#rooms').getByRole('link', { name: 'Book now' });
   }
- 
+  get roomCards() : Locator {
+    return this.page.locator('.room-card');
+  }
   async goto() {
     await this.page.goto('https://automationintesting.online/');
   }
@@ -41,5 +43,8 @@ export class HomePage {
   }
   async clickSearch() {
     await this.searchButton.click();
+  }
+  async clickbookNowByRoomDescription(roomDescription : string) {
+    await this.roomCards.filter({hasText: roomDescription}).getByRole('link', {name: 'Book now'}).click();
   }
 }

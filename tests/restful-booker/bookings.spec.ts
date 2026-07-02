@@ -29,4 +29,9 @@ test.describe('restful-booker basic tests', () => {
     //verify booking confirmation
     await expect(bookingPage.bookingConfirmationMessage).toBeVisible();
   });
+
+  test('book by description', async({}) => {
+    await homePage.clickSearch();
+    await homePage.clickbookNowByRoomDescription('Aenean porttitor mauris sit amet lacinia molestie');
+  });
 });

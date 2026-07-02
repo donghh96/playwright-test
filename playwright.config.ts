@@ -60,7 +60,7 @@ export default defineConfig({
         storageState: '.auth/admin.json',
        },
        dependencies: ['setup'],
-       testMatch: 'tests/restful-booker/admin-dashboard.spec.ts',
+       testMatch: ['**/admin-dashboard.spec.ts', '**/e2e.spec.ts'],
     },
 
     /* Test against mobile viewports. */

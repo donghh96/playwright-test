@@ -1,10 +1,11 @@
-import {Locator, Page} from '@playwright/test';
+import {Locator, Page, expect} from '@playwright/test';
 
-interface RoomData {
+export interface RoomData {
   name : string;
   type : 'Single' | 'Twin' | 'Double ' | 'Family' | 'Suite' ;
   accessible : 'false' | 'true';
   price : string;
+  description ?: string;
   roomDetails :
   {
     wifi ?: boolean;
@@ -31,7 +32,15 @@ export class AdminDashboardPage {
   get brandingTabHeadingMap() : Locator { return this.page.getByRole('heading', {name: 'Map details'});}
   get brandingTabHeadingContact() : Locator { return this.page.getByRole('heading', {name: 'Contact details'});}
   get brandingTabHeadingAdderess() : Locator { return this.page.getByRole('heading', {name: 'Address details'});}
-  
+  get messageTabName() : Locator { return this.page.getByText('Name')};
+  get messageTabSubject() : Locator { return this.page.getByText('Subject')};
+  get firstMessage() : Locator { return this.page.getByTestId('message0')};
+  get messageDetail() : Locator { return this.page.getByTestId('message')};
+  getMessageBySubject(messageSubject : string) : Locator { return this.page.getByText(messageSubject)};
+
+  async goto () {
+    await this.page.goto('https://automationintesting.online/admin/rooms');
+  }
   async clickHomeLink() {
     await this.homeLink.click();
   }
@@ -46,6 +55,12 @@ export class AdminDashboardPage {
   }
   async clickMessagesLink() {
     await this.messagesLink.click();
+  }
+  async viewMessage() {
+    await this.firstMessage.click();
+  }
+  async closeMessage() {
+    await this.page.getByRole('button', {name: 'Close'}).click();
   }
   async createRoom(roomdata : RoomData)
   {
@@ -65,8 +80,32 @@ export class AdminDashboardPage {
   {
     return this.rooms.filter({hasText: roomName});
   }
+  async viewRoomDetails(roomnName : string)
+  {
+    await this.getRoomByName(roomnName).click();
+  }
+  async addRoomDescription(roomDescription : string)
+  {
+    await this.page.getByRole('button', { name: 'Edit' }).click();
+    // await this.page.getByRole('textbox', { name: 'Description' }).fill(roomDescription);
+    // await this.page.locator('#update').click();
+    // await expect(this.page.getByText(roomDescription)).toBeVisible({timeout : 10000});
+
+    const box = this.page.locator('#description');
+    await box.fill(roomDescription);
+    await expect(box).toHaveValue(roomDescription);
+
+    await this.page.locator('#update').click();
+    await this.page.waitForTimeout(1000);
+    await this.page.reload();
+    await expect(this.page.getByText(roomDescription)).toBeVisible();
+  }
   async deleteRoom(roomName : string)
   {
-    await (await this.getRoomByName(roomName)).locator('.roomDelete').click();
+    await this.getRoomByName(roomName).locator('.roomDelete').click();
+  }
+  getBookingByGuestName(guestname : string)
+  {
+    return this.page.locator('.detail').filter({hasText: guestname});
   }
 }

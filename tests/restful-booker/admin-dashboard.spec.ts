@@ -6,7 +6,7 @@ test.describe('admin dashboard tests', () => {
 
   test.beforeEach(async ({page}) => {
     adminDashboardPage = new AdminDashboardPage(page);
-    await page.goto('https://automationintesting.online/admin/rooms');
+    await adminDashboardPage.goto();
   })
 
   test('should rooms count greater than 1', async({}) => {
@@ -50,18 +50,43 @@ test.describe('admin dashboard tests', () => {
     await expect(newroom).toHaveCount(0);
   });
 
-  test('should navigate to report page sucessfully', async({page}) => {
+  test('should add a room description successfully', async({page}) => {
+    const roomName = `Room-${Date.now()}`;
+    await adminDashboardPage.createRoom({name:roomName, type:'Single', accessible:'true', price:'220', roomDetails:{tv:true, wifi:true}});
+    const newroom = adminDashboardPage.getRoomByName(roomName);
+    await expect(newroom).toBeVisible();
+    await adminDashboardPage.viewRoomDetails(roomName);
+    await adminDashboardPage.addRoomDescription('room description');
+
+    await expect(page.getByText('room description')).toBeVisible({timeout : 10000});
+  });
+
+  test('should navigate to report page successfully', async({page}) => {
     await adminDashboardPage.clickReportLink();
     await expect(page).toHaveURL(/report/);
     await expect(adminDashboardPage.reportTabCalender).toBeVisible();
   });
 
-  test('should navigate to branding page sucessfully', async({page}) => {
+  test('should navigate to branding page successfully', async({page}) => {
     await adminDashboardPage.clickBrandingLink();
     await expect(page).toHaveURL(/branding/);
     await expect(adminDashboardPage.brandingTabHeadingBB).toBeVisible();
     await expect(adminDashboardPage.brandingTabHeadingMap).toBeVisible();
     await expect(adminDashboardPage.brandingTabHeadingContact).toBeVisible();
     await expect(adminDashboardPage.brandingTabHeadingAdderess).toBeVisible();
+  });
+
+  test('should navigate to message page successfully', async({page}) => {
+    await adminDashboardPage.clickMessagesLink();
+    await expect(page).toHaveURL(/message/);
+    await expect(adminDashboardPage.messageTabName).toBeVisible();
+    await expect(adminDashboardPage.messageTabSubject).toBeVisible();
+  });
+
+  test('should be able to view the message details', async({}) => {
+    await adminDashboardPage.clickMessagesLink();
+    await adminDashboardPage.viewMessage(); 
+    await expect(adminDashboardPage.messageDetail).toBeVisible();
+    await adminDashboardPage.closeMessage();
   });
 });
