@@ -1,26 +1,21 @@
-import {test, expect} from '@playwright/test';
+import { test, expect, APIRequestContext } from '@playwright/test';
 import { createBookingData } from '../fixtures/restful-booker/BookingDataFactory';  
+
+async function createBooking( request : APIRequestContext,  data : object) 
+{
+  const response = await request.post('/booking', { data });
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  return body.bookingid;
+}
 
 test.describe('restful-booker API tests', () => {
   let token: string;
-  const BASEURL = 'https://restful-booker.herokuapp.com';
   const createdId: number[] = [];
-  const bookingData = createBookingData();
-  // const bookingData = {
-  //     "firstname": "Kitty",
-  //     "lastname": "Cat",
-  //     "totalprice": 100,
-  //     "depositpaid": true,
-  //     "bookingdates": {
-  //       "checkin": "2026-10-01",
-  //       "checkout": "2026-10-05"
-  //     },
-  //     "additionalneeds": "Breakfast"
-  // };
 
   test.beforeAll(async ({request}) => {
     //create a token
-    const tokenResponse = await request.post(`${BASEURL}/auth`, {
+    const tokenResponse = await request.post('/auth', {
       data: {
         "username": "admin",
         "password": "password123"
@@ -35,7 +30,7 @@ test.describe('restful-booker API tests', () => {
   test.afterAll(async ({request}) => {
     // Clean up - delete any created bookings
     for (const id of createdId) {
-      const deleteResponse = await request.delete(`${BASEURL}/booking/${id}`, {
+      const deleteResponse = await request.delete(`/booking/${id}`, {
         headers: {
           'Cookie': `token=${token}`
         }
@@ -46,7 +41,7 @@ test.describe('restful-booker API tests', () => {
   });
 
   test('get all bookings', async ({request}) => {
-    const response = await request.get(`${BASEURL}/booking`);
+    const response = await request.get('/booking');
     expect(response.status()).toBe(200);
     const body = await response.json();
     // console.log(body);
@@ -54,20 +49,22 @@ test.describe('restful-booker API tests', () => {
   });
 
   test('get booking by id', async ({request}) => {
-    const allResponse = await request.get(`${BASEURL}/booking`);
-    expect(allResponse.status()).toBe(200);
-    const allBookings = await allResponse.json();
-    const bookingId = allBookings[0].bookingid;
-
-    const response = await request.get(`${BASEURL}/booking/${bookingId}`);
+    const bookingData = createBookingData();
+    //create a booking first
+    const bookingId = await createBooking(request, bookingData);
+    createdId.push(bookingId);
+    console.log('Created booking ID: ', bookingId);
+   
+    const response = await request.get(`/booking/${bookingId}`);
     expect(response.status()).toBe(200);
     const body = await response.json();
     console.log(body);
+    expect(body).toMatchObject({...bookingData});
   });
 
   test('post create booking', async ({request}) => {
-    
-    const response = await request.post(`${BASEURL}/booking`, {
+    const bookingData = createBookingData();
+    const response = await request.post('/booking', {
       data: bookingData,
     });
     expect(response.status()).toBe(200);
@@ -76,26 +73,17 @@ test.describe('restful-booker API tests', () => {
     const bookingId = body.bookingid;
     createdId.push(bookingId);
     console.log('Created booking ID: ', bookingId);
-    expect(body.booking.firstname).toBe(bookingData.firstname);
-    expect(body.booking.lastname).toBe(bookingData.lastname);
-    expect(body.booking.bookingdates.checkin).toBe(bookingData.bookingdates.checkin);
-    expect(body.booking.bookingdates.checkout).toBe(bookingData.bookingdates.checkout);
-    expect(body.booking.additionalneeds).toBe(bookingData.additionalneeds);
-    expect(body.booking.totalprice).toBe(bookingData.totalprice);
-    expect(body.booking.depositpaid).toBe(bookingData.depositpaid);
+    expect(body.booking).toMatchObject({...bookingData});
   }); 
 
   test('delete a booking', async ({request}) => {
+    const bookingData = createBookingData();
     //create a booking first
-    const createResponse = await request.post(`${BASEURL}/booking`, { 
-      data: bookingData,
-    });
-    expect(createResponse.status()).toBe(200);
-    const createBody = await createResponse.json();
-    const bookingId = createBody.bookingid;
+    const bookingId = await createBooking(request, bookingData);
     console.log('Created booking ID: ', bookingId);
+
     // Now delete the booking
-    const deleteResponse = await request.delete(`${BASEURL}/booking/${bookingId}`, {
+    const deleteResponse = await request.delete(`/booking/${bookingId}`, {
       headers: {
         'Cookie': `token=${token}`
       }
@@ -103,34 +91,20 @@ test.describe('restful-booker API tests', () => {
     expect(deleteResponse.status()).toBe(201);
     console.log(`Deleted booking ID: ${bookingId}`); 
     //verify deletion
-    const getResponse = await request.get(`${BASEURL}/booking/${bookingId}`);
+    const getResponse = await request.get(`/booking/${bookingId}`);
     expect(getResponse.status()).toBe(404);
   });
   
   test('update a booking', async ({request}) => {
+    const bookingData = createBookingData();
     //create a booking first
-    const createResponse = await request.post(`${BASEURL}/booking`, { 
-      data: bookingData,
-    });
-    expect(createResponse.status()).toBe(200);
-    const createBody = await createResponse.json();
-    const bookingId = createBody.bookingid;
+    const bookingId = await createBooking(request, bookingData);
     createdId.push(bookingId);
     console.log('Created booking ID: ', bookingId);
 
     // Now update the booking
-    const updatedData = {
-      "firstname": "Kitty",
-      "lastname": "Cat",
-      "totalprice": 320,
-      "depositpaid": true,
-      "bookingdates": {
-        "checkin": "2026-10-01",
-        "checkout": "2026-10-08"
-      },
-      "additionalneeds": "Breakfast"
-    };
-    const updateResponse = await request.put(`${BASEURL}/booking/${bookingId}`, {
+    const updatedData = createBookingData({totalprice:320, bookingdates:{checkin: '2026-10-01', checkout: '2026-10-08' }});
+    const updateResponse = await request.put(`/booking/${bookingId}`, {
       data: updatedData,
       headers: {
         'Cookie': `token=${token}`
@@ -138,19 +112,15 @@ test.describe('restful-booker API tests', () => {
     });
     expect(updateResponse.status()).toBe(200);
     const updateBody = await updateResponse.json();
-    console.log('Updated booking:', updateBody);
+    // console.log('Updated booking:', updateBody);
     expect(updateBody.totalprice).toBe(320);
     expect(updateBody.bookingdates.checkout).toBe('2026-10-08');
   });
 
   test('partially update a booking', async ({request}) => {
     //create a booking first
-    const createResponse = await request.post(`${BASEURL}/booking`, { 
-      data: bookingData,
-    });
-    expect(createResponse.status()).toBe(200);
-    const createBody = await createResponse.json();
-    const bookingId = createBody.bookingid;
+    const bookingData = createBookingData();
+    const bookingId = await createBooking(request, bookingData);
     createdId.push(bookingId);
     console.log('Created booking ID: ', bookingId); 
 
@@ -160,7 +130,7 @@ test.describe('restful-booker API tests', () => {
       "additionalneeds": "Late checkout"
     };
 
-    const updateResponse = await request.patch(`${BASEURL}/booking/${bookingId}`, {
+    const updateResponse = await request.patch(`/booking/${bookingId}`, {
       data: partialData,
       headers: { 
         'Cookie': `token=${token}`
@@ -168,10 +138,15 @@ test.describe('restful-booker API tests', () => {
     });
     expect(updateResponse.status()).toBe(200);
     const updateBody = await updateResponse.json();
-    console.log('Partially updated booking:', updateBody);
+    // console.log('Partially updated booking:', updateBody);
 
     expect(updateBody.totalprice).toBe(500);
     expect(updateBody.additionalneeds).toBe('Late checkout');
+  });
+  test('get booking by invalid id returns 404', async ({ request }) => {
+    const response = await request.get('/booking/999999999');
+
+    expect(response.status()).toBe(404);
   });
 });
 

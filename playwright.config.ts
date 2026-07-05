@@ -62,6 +62,13 @@ export default defineConfig({
        dependencies: ['setup'],
        testMatch: ['**/admin-dashboard.spec.ts', '**/e2e.spec.ts'],
     },
+    {
+      name: 'restful-booker api',
+      use: {
+        baseURL: 'https://restful-booker.herokuapp.com',
+      },
+      testMatch: ['**/booking-api.spec.ts'],
+    },
 
     /* Test against mobile viewports. */
     // {
