@@ -69,6 +69,15 @@ export default defineConfig({
       },
       testMatch: ['**/booking-api.spec.ts'],
     },
+    {
+      name: 'saucedemo tests',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://www.saucedemo.com/',
+        testIdAttribute: 'data-test',
+      },
+      testMatch: ['**/saucedemo/**'],
+    }
 
     /* Test against mobile viewports. */
     // {

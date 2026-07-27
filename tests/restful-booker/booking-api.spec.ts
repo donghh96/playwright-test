@@ -1,5 +1,5 @@
 import { test, expect, APIRequestContext } from '@playwright/test';
-import { createBookingData } from '../fixtures/restful-booker/BookingDataFactory';  
+import { createBookingData } from '../../fixtures/restful-booker/BookingDataFactory';
 
 async function createBooking( request : APIRequestContext,  data : object) 
 {
