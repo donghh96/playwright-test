@@ -85,7 +85,7 @@ test.describe('inventory page tests', async () => {
   });
 
   test('goto shopping cart', async({page}) => {
-    await inventoryPage.shoppingcartButton.click();
+    await inventoryPage.gotoShoppingCart();
     await expect(page).toHaveURL(/cart.html/);
   });
 })

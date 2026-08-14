@@ -3,6 +3,7 @@ import { Locator, Page } from "@playwright/test";
 export class InventoryPage {
   constructor (private page: Page) {};
 
+  get pageTitle(): Locator { return this.page.getByTestId('title')};
   get shoppingcartButton(): Locator {return this.page.getByTestId('shopping-cart-link')};
   get shoppingcartBadge(): Locator {return this.page.getByTestId('shopping-cart-badge')};
   get sortLink() : Locator {return this.page.getByTestId('product-sort-container')};
@@ -39,6 +40,10 @@ export class InventoryPage {
 
   async sortProducts(option: 'az' | 'za' | 'lohi' | 'hilo') {
     await this.sortLink.selectOption(option);
+  }
+
+  async gotoShoppingCart() {
+    await this.shoppingcartButton.click();
   }
 
   async resetAppState() {

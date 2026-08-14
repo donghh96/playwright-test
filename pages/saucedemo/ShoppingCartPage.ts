@@ -10,6 +10,9 @@ export class ShoppingCartPage {
   get cartProducts(): Locator { return this.page. getByTestId('inventory-item')};
   get removeButton(): Locator { return this.page.getByRole('button', {name: 'Remove'})};
 
+  get cartProductsNames() : Locator { return this.page.getByTestId('inventory-item-name')};
+  get cartItemPrices() : Locator { return this.page.getByTestId('inventory-item-price')};
+
   getProductByName(name: string) {
     return this.cartProducts.filter({hasText: name});
   }
@@ -28,5 +31,12 @@ export class ShoppingCartPage {
 
   async gotoCheckout() {
     await this.checkoutButton.click();
+  }
+
+  async getItemPrices(): Promise<number[]> {
+    const price = await this.cartItemPrices.allTextContents();
+    return price.map(price =>
+      Number(price.replace('$', ''))
+    );
   }
 }
