@@ -19,7 +19,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps chromium
     - name: Run Playwright tests saucedemo tests
-      run: npx playwright test --project='sourcesaucedemo tests'
+      run: npx playwright test --project='saucedemo tests'
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
