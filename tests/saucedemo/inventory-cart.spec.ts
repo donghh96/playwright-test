@@ -26,18 +26,18 @@ test.describe('inventory page tests', async () => {
   test('sort products by names A to Z', async({}) => {
     await inventoryPage.sortProducts('az');
     const productNames = await inventoryPage.productNames.allTextContents();
-    console.log(productNames);
+    // console.log(productNames);
     const sortedProductNames = productNames.sort();
-    console.log(sortedProductNames);
+    // console.log(sortedProductNames);
     expect(productNames).toEqual(sortedProductNames);
   });
 
  test('sort products by names Z to A', async({}) => {
     await inventoryPage.sortProducts('za');
     const productNames = await inventoryPage.productNames.allTextContents();
-    console.log(productNames);
+    // console.log(productNames);
     const reverseSortedProductNames = productNames.sort().reverse();
-    console.log(reverseSortedProductNames);    
+    // console.log(reverseSortedProductNames);    
     expect(productNames).toEqual(reverseSortedProductNames);
   });
 
